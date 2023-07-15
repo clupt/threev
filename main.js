@@ -26,11 +26,8 @@ const axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
 
 camera.position.set(-10, 30, 30);
-// camera.position.x = 0;
-// camera.position.y = 2;
-// camera.position.z = 5;
 
-//object
+//objects
 const boxGeometry = new THREE.BoxGeometry();
 const boxMaterial = new THREE.MeshBasicMaterial(
   {
@@ -42,11 +39,35 @@ const boxMaterial = new THREE.MeshBasicMaterial(
 const box = new THREE.Mesh(boxGeometry, boxMaterial);
 scene.add(box);
 
-//plane
+
+const sphereGeometry = new THREE.SphereGeometry(4, 50, 50);//radius, w, h
+
+const sphereMaterial = new THREE.MeshStandardMaterial(
+  {
+    color: 0x0000FF,
+    wireframe: false
+  }
+);
+
+const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+scene.add(sphere);
+sphere.position.set(-10, 10, 0);
+
+//lights
+const pointLight = new THREE.PointLight(0xffffff);
+pointLight.position.set(10, 5, 5);
+
+const ambientLight = new THREE.AmbientLight(0xffffff);
+scene.add(pointLight, ambientLight);
+
+const lightHelper = new THREE.PointLightHelper(pointLight);
+scene.add(lightHelper);
+
+// plane
 const planeGeometry = new THREE.PlaneGeometry(30, 30);
 const planeMaterial = new THREE.MeshBasicMaterial(
   {
-    color: 0xFFFFFF,
+    color: 0xffffff,
     side: THREE.DoubleSide
   }
 );
@@ -54,7 +75,7 @@ const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 scene.add(plane);
 plane.rotation.x = -0.5 * Math.PI; //make plane match grid
 
-const gridHelper = new THREE.GridHelper(30);
+const gridHelper = new THREE.GridHelper(50,50);
 scene.add(gridHelper);
 
 
