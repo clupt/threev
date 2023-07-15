@@ -29,15 +29,14 @@ camera.position.set(-10, 30, 30);
 
 //textures
 const textureLoader = new THREE.TextureLoader();
-const plantTexture = textureLoader.load(
-  'plants.jpg'
-);
-const woodTexture = textureLoader.load(
-  'wood.jpg'
-)
+
+const plantTexture = textureLoader.load('plants.jpg');
+const woodTexture = textureLoader.load('wood.jpg');
+const waterTexture = textureLoader.load('water.jpg');
+const brickTexture = textureLoader.load('brick.jpg');
 
 //objects
-const boxGeometry = new THREE.BoxGeometry();
+const boxGeometry = new THREE.BoxGeometry(20, 20, 20);
 const boxMaterial = new THREE.MeshBasicMaterial(
   {
     color: 0x00ff00,
@@ -47,25 +46,39 @@ const boxMaterial = new THREE.MeshBasicMaterial(
 );
 
 const box = new THREE.Mesh(boxGeometry, boxMaterial);
-scene.add(box);
+// scene.add(box);
+// box.position.set(-25, 20, 0)
 
-const sphereGeometry = new THREE.SphereGeometry(4, 50, 50);//radius, w, h
+const sphereGeometry = new THREE.SphereGeometry(10, 60, 60);//radius, w, h
 const sphereMaterial = new THREE.MeshStandardMaterial(
   {
-    color: 0xffffff,
+    color: 'tomato',
     wireframe: false,
-    map: woodTexture
+    normalMap: waterTexture
   }
 );
 
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 scene.add(sphere);
-sphere.position.set(-10, 10, 0);
+sphere.position.set(-5, 10, 0);
+
+const torusGeometry = new THREE.TorusGeometry(14, 4, 10, 75) ;
+const torusMaterial = new THREE.MeshStandardMaterial(
+  {
+    color: 'bisque',
+    wireframe: false,
+    normalMap: plantTexture
+  }
+);
+
+const torus = new THREE.Mesh(torusGeometry, torusMaterial);
+scene.add(torus);
+torus.position.set(-5, 10, 0);
 
 
 //lights
-const pointLight = new THREE.PointLight(0xffffff);
-pointLight.position.set(5, 5, 5);
+const pointLight = new THREE.PointLight(0xF1EB9C);
+pointLight.position.set(-40, 0, 5);
 
 const ambientLight = new THREE.AmbientLight(0x404040);//soft white light
 scene.add(pointLight, ambientLight);
@@ -77,7 +90,9 @@ scene.add(lightHelper);
 const planeGeometry = new THREE.PlaneGeometry(30, 30);
 const planeMaterial = new THREE.MeshBasicMaterial(
   {
-    color: 0xaaaaff,
+    color: 'chartreuse',
+    transparent: true,
+    opacity: 0.5,
     side: THREE.DoubleSide
   }
 );
@@ -85,18 +100,23 @@ const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 scene.add(plane);
 plane.rotation.x = -0.5 * Math.PI; //make plane match grid
 
-const gridHelper = new THREE.GridHelper(50,50);
+const gridHelper = new THREE.GridHelper(100, 50);
 scene.add(gridHelper);
 
 
 
 function animate(time) {
-  box.rotation.x = time / 1000;
-  box.rotation.y = time / 1000;
-  sphere.rotation.x = time / 1000;
-  sphere.rotation.y = time / 1000;
+  // box.rotation.x = time / 1000;
+  // box.rotation.y = time / 1000;
+  sphere.rotation.x = time / 5000;
+  sphere.rotation.y = time / 5000;
+  sphere.rotation.z = time / 5000;
+  torus.rotation.x = time / 500;
+  torus.rotation.y = time / 500;
+  torus.rotation.z = time / 2500;
   // pointLight.position.set(Math.random(), 5, 5); //attempt at light flickering
-
+  pointLight.position.set(-20, 40, 5);
+  orbit.update();
   renderer.render(scene, camera);
 }
 
