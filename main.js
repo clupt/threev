@@ -1,6 +1,8 @@
 import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as dat from 'dat.gui';
+
 
 //renderer
 const renderer = new THREE.WebGLRenderer();
@@ -26,6 +28,27 @@ const axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
 
 camera.position.set(-10, 30, 30);
+
+//gui
+const gui = new dat.GUI();
+
+const options = {
+  sphereColor: '#ffea00',
+  sphereWireframe: false,
+  torusWireframe: false
+}
+
+gui.addColor(options, 'sphereColor').onChange((evt)=>{
+  sphere.material.color.set(evt)
+});
+
+gui.add(options, 'sphereWireframe').onChange((evt)=>{
+  sphere.material.wireframe = evt
+});
+
+gui.add(options, 'torusWireframe').onChange((evt)=>{
+  torus.material.wireframe = evt
+});
 
 //textures
 const textureLoader = new THREE.TextureLoader();
