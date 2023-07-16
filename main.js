@@ -33,10 +33,13 @@ camera.position.set(-10, 30, 30);
 const gui = new dat.GUI();
 
 const options = {
-  sphereColor: '#ffea00',
+  sphereColor: '#f7e3c2',
   sphereWireframe: false,
-  torusWireframe: false
+  // torusWireframe: false,
+  sphereBounceSpeed: 0.01,
 }
+
+gui.add(options, 'sphereBounceSpeed', 0, .2); // min/max (set in animate fn)
 
 gui.addColor(options, 'sphereColor').onChange((evt)=>{
   sphere.material.color.set(evt)
@@ -46,9 +49,9 @@ gui.add(options, 'sphereWireframe').onChange((evt)=>{
   sphere.material.wireframe = evt
 });
 
-gui.add(options, 'torusWireframe').onChange((evt)=>{
-  torus.material.wireframe = evt
-});
+// gui.add(options, 'torusWireframe').onChange((evt)=>{
+//   torus.material.wireframe = evt
+// });
 
 //textures
 const textureLoader = new THREE.TextureLoader();
@@ -77,7 +80,7 @@ const sphereMaterial = new THREE.MeshStandardMaterial(
   {
     color: 'tomato',
     wireframe: false,
-    normalMap: waterTexture
+    // normalMap: waterTexture
   }
 );
 
@@ -95,7 +98,7 @@ const torusMaterial = new THREE.MeshStandardMaterial(
 );
 
 const torus = new THREE.Mesh(torusGeometry, torusMaterial);
-scene.add(torus);
+// scene.add(torus);
 torus.position.set(-5, 10, 0);
 
 
@@ -126,7 +129,10 @@ plane.rotation.x = -0.5 * Math.PI; //make plane match grid
 const gridHelper = new THREE.GridHelper(100, 50);
 scene.add(gridHelper);
 
+//animation
 
+let step = 0;
+// let speed = 0.01; //move speed of bounce to property in gui options obj
 
 function animate(time) {
   // box.rotation.x = time / 1000;
@@ -139,6 +145,11 @@ function animate(time) {
   torus.rotation.z = time / 2500;
   // pointLight.position.set(Math.random(), 5, 5); //attempt at light flickering
   pointLight.position.set(-20, 40, 5);
+
+  //bouncing sphere
+  step += options.sphereBounceSpeed
+  sphere.position.y = 10 * Math.abs(Math.sin(step));
+
   orbit.update();
   renderer.render(scene, camera);
 }
