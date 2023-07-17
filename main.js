@@ -3,6 +3,11 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'dat.gui';
 
+import plants from './imgs/plants.jpg';
+import sky from './imgs/sky.jpg';
+import water from './imgs/water.jpg';
+import brick from './imgs/brick.jpg';
+import wood from './imgs/wood.jpg';
 
 /****************************** RENDERER **************************************/
 const renderer = new THREE.WebGLRenderer();
@@ -14,6 +19,9 @@ document.body.appendChild(renderer.domElement);
 
 //scene
 const scene = new THREE.Scene();
+
+// scene.fog = new THREE.Fog(0xffeeaa, 0, 400);
+// scene.fog = new THREE.FogExp2(0xffeeaa, 0.01);
 
 /****************************** CAMERA ****************************************/
 const camera = new THREE.PerspectiveCamera(
@@ -40,7 +48,8 @@ const options = {
   penumbra: 0,
   intensity: 1,
   decay: 0,
-  spotLightColor: '#f5f582'
+  spotLightColor: '#f5f582',
+  fogColor: '#ffeeaa'
 }
 
 gui.add(options, 'sphereBounceSpeed', 0, .2); // min/max (set in animate fn)
@@ -57,6 +66,10 @@ gui.addColor(options, 'spotLightColor').onChange((evt)=>{
   spotLight.color.set(evt)
 });
 
+// gui.addColor(options, 'fogColor').onChange((evt)=>{
+//   scene.fog.color.set(evt)
+// })
+
 gui.add(options, 'sphereWireframe').onChange((evt)=>{
   sphere.material.wireframe = evt
 });
@@ -68,10 +81,18 @@ gui.add(options, 'sphereWireframe').onChange((evt)=>{
 /****************************** TEXTURES **************************************/
 const textureLoader = new THREE.TextureLoader();
 
-const plantTexture = textureLoader.load('plants.jpg');
-const woodTexture = textureLoader.load('wood.jpg');
-const waterTexture = textureLoader.load('water.jpg');
-const brickTexture = textureLoader.load('brick.jpg');
+const plantTexture = textureLoader.load(plants);
+const skyTexture = textureLoader.load(sky);
+// const woodTexture = textureLoader.load('wood.jpg');
+// const waterTexture = textureLoader.load('water.jpg');
+// const brickTexture = textureLoader.load('brick.jpg');
+
+scene.background = skyTexture;
+
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+scene.background = cubeTextureLoader.load([
+  sky, water, wood, brick, plants, sky
+])
 
 /****************************** OBJECTS ***************************************/
 const boxGeometry = new THREE.BoxGeometry(20, 20, 20);
@@ -151,7 +172,7 @@ const planeMaterial = new THREE.MeshStandardMaterial(
 );
 
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-scene.add(plane);
+// scene.add(plane);
 plane.rotation.x = -0.5 * Math.PI; //make plane match grid
 plane.receiveShadow = true;
 
@@ -159,7 +180,7 @@ plane.receiveShadow = true;
 /******************************* HELPERS **************************************/
 //grid
 const gridHelper = new THREE.GridHelper(100, 50);
-scene.add(gridHelper);
+// scene.add(gridHelper);
 
 //light helpers
 // const dLightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
