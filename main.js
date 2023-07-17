@@ -8,6 +8,7 @@ import sky from './imgs/sky.jpg';
 import water from './imgs/water.jpg';
 import brick from './imgs/brick.jpg';
 import wood from './imgs/wood.jpg';
+import stars from './imgs/stars.jpg';
 
 /****************************** RENDERER **************************************/
 const renderer = new THREE.WebGLRenderer();
@@ -19,9 +20,6 @@ document.body.appendChild(renderer.domElement);
 
 //scene
 const scene = new THREE.Scene();
-
-// scene.fog = new THREE.Fog(0xffeeaa, 0, 400);
-// scene.fog = new THREE.FogExp2(0xffeeaa, 0.01);
 
 /****************************** CAMERA ****************************************/
 const camera = new THREE.PerspectiveCamera(
@@ -42,14 +40,14 @@ const gui = new dat.GUI();
 const options = {
   sphereColor: '#f7e3c2',
   sphereWireframe: false,
-  // torusWireframe: false,
-  sphereBounceSpeed: 0.01,
+  torusWireframe: false,
+  sphereBounceSpeed: 0.05,
   angle: 0.2,
   penumbra: 0,
   intensity: 1,
   decay: 0,
   spotLightColor: '#f5f582',
-  fogColor: '#ffeeaa'
+  planeColor: '#ffeeaa',
 }
 
 gui.add(options, 'sphereBounceSpeed', 0, .2); // min/max (set in animate fn)
@@ -66,32 +64,33 @@ gui.addColor(options, 'spotLightColor').onChange((evt)=>{
   spotLight.color.set(evt)
 });
 
-// gui.addColor(options, 'fogColor').onChange((evt)=>{
-//   scene.fog.color.set(evt)
-// })
-
 gui.add(options, 'sphereWireframe').onChange((evt)=>{
   sphere.material.wireframe = evt
 });
 
-// gui.add(options, 'torusWireframe').onChange((evt)=>{
-//   torus.material.wireframe = evt
-// });
+gui.add(options, 'torusWireframe').onChange((evt)=>{
+  torus.material.wireframe = evt
+});
+
+gui.addColor(options, 'planeColor').onChange((evt)=>{
+  plane.material.color.set(evt)
+});
 
 /****************************** TEXTURES **************************************/
 const textureLoader = new THREE.TextureLoader();
 
 const plantTexture = textureLoader.load(plants);
 const skyTexture = textureLoader.load(sky);
-// const woodTexture = textureLoader.load('wood.jpg');
-// const waterTexture = textureLoader.load('water.jpg');
-// const brickTexture = textureLoader.load('brick.jpg');
+const woodTexture = textureLoader.load(wood);
+const waterTexture = textureLoader.load(water);
+const brickTexture = textureLoader.load(brick);
+const starsTexture = textureLoader.load(stars);
 
 scene.background = skyTexture;
 
 const cubeTextureLoader = new THREE.CubeTextureLoader();
 scene.background = cubeTextureLoader.load([
-  sky, water, wood, brick, plants, sky
+  sky, sky, stars, plants, sky, sky
 ])
 
 /****************************** OBJECTS ***************************************/
@@ -100,20 +99,22 @@ const boxMaterial = new THREE.MeshBasicMaterial(
   {
     color: 0x00ff00,
     wireframe: false,
-    map: plantTexture
+    // map: plantTexture
   }
 );
 
 const box = new THREE.Mesh(boxGeometry, boxMaterial);
-// scene.add(box);
-// box.position.set(-25, 20, 0)
+scene.add(box);
+box.position.set(45, 20, 0);
+box.castShadow = true;
+box.receiveShadow = true;
 
 const sphereGeometry = new THREE.SphereGeometry(4, 50, 50);//radius, w, h
 const sphereMaterial = new THREE.MeshStandardMaterial(
   {
-    color: 'tomato',
+    color: '#ff2800',
     wireframe: false,
-    // normalMap: waterTexture
+    // normalMap: woodTexture
   }
 );
 
@@ -135,7 +136,7 @@ const torusMaterial = new THREE.MeshStandardMaterial(
 
 const torus = new THREE.Mesh(torusGeometry, torusMaterial);
 scene.add(torus);
-torus.position.set(-5, 10, 0);
+torus.position.set(-10, 20, 0);
 torus.castShadow = true;
 torus.receiveShadow = true;
 
@@ -164,15 +165,15 @@ spotLight.angle = 0.2 //spotLight shadow is pixelated when angle is too wide
 const planeGeometry = new THREE.PlaneGeometry(200, 200);
 const planeMaterial = new THREE.MeshStandardMaterial(
   {
-    color: 0xFFFFFF,
-    // transparent: false,
-    // opacity: 0.5,
+    color: 0xffeeaa,
+    transparent: true,
+    opacity: 0.5,
     side: THREE.DoubleSide
   }
 );
 
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-// scene.add(plane);
+scene.add(plane);
 plane.rotation.x = -0.5 * Math.PI; //make plane match grid
 plane.receiveShadow = true;
 
@@ -218,7 +219,7 @@ function animate(time) {
 
   //bouncing sphere
   step += options.sphereBounceSpeed;
-  sphere.position.y = 10 * Math.abs(Math.sin(step));
+  sphere.position.y = 20 * Math.abs(Math.sin(step));
 
   //spotLight props
   spotLight.angle = options.angle;
