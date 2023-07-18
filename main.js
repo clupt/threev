@@ -107,7 +107,18 @@ const box = new THREE.Mesh(boxGeometry, boxMaterial);
 scene.add(box);
 box.position.set(45, 20, 0);
 box.castShadow = true;
-box.receiveShadow = true;
+// box.receiveShadow = true;
+
+const brickCubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+const brickCubeMaterial = new THREE.MeshStandardMaterial({
+  map: brickTexture,
+  normalMap: starsTexture
+});
+const brickCube = new THREE.Mesh(brickCubeGeometry, brickCubeMaterial);
+brickCube.castShadow = true;
+brickCube.receiveShadow = true;
+brickCube.position.set(0, 20, 0);
+scene.add(brickCube);
 
 const sphereGeometry = new THREE.SphereGeometry(4, 50, 50);//radius, w, h
 const sphereMaterial = new THREE.MeshStandardMaterial(
@@ -133,6 +144,8 @@ const torusMaterial = new THREE.MeshStandardMaterial(
     // normalMap: plantTexture
   }
 );
+
+torusMaterial.map = waterTexture;
 
 const torus = new THREE.Mesh(torusGeometry, torusMaterial);
 scene.add(torus);
