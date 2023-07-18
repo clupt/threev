@@ -23,7 +23,7 @@ const scene = new THREE.Scene();
 
 /****************************** CAMERA ****************************************/
 const camera = new THREE.PerspectiveCamera(
-  45,
+  75,
   window.innerWidth / window.innerHeight,
   0.1,
   1000
@@ -41,6 +41,7 @@ const options = {
   sphereColor: '#f7e3c2',
   sphereWireframe: false,
   torusWireframe: false,
+  brickCubeWireframe: false,
   sphereBounceSpeed: 0.05,
   angle: 0.2,
   penumbra: 0,
@@ -72,6 +73,10 @@ gui.add(options, 'torusWireframe').onChange((evt)=>{
   torus.material.wireframe = evt
 });
 
+gui.add(options, 'brickCubeWireframe').onChange((evt)=>{
+  brickCube.material.wireframe = evt
+});
+
 gui.addColor(options, 'planeColor').onChange((evt)=>{
   plane.material.color.set(evt)
 });
@@ -90,12 +95,12 @@ scene.background = skyTexture;
 
 const cubeTextureLoader = new THREE.CubeTextureLoader();
 scene.background = cubeTextureLoader.load([
-  sky, sky, stars, plants, sky, sky
-])
+  sky, sky, sky, sky, sky, sky
+]);
 
 /****************************** OBJECTS ***************************************/
 const boxGeometry = new THREE.BoxGeometry(20, 20, 20);
-const boxMaterial = new THREE.MeshBasicMaterial(
+const boxMaterial = new THREE.MeshStandardMaterial(
   {
     color: 0x00ff00,
     wireframe: false,
@@ -104,10 +109,12 @@ const boxMaterial = new THREE.MeshBasicMaterial(
 );
 
 const box = new THREE.Mesh(boxGeometry, boxMaterial);
-scene.add(box);
 box.position.set(45, 20, 0);
 box.castShadow = true;
 // box.receiveShadow = true;
+const boxId = box.id;
+console.log("boxId=", boxId);
+scene.add(box);
 
 const brickCubeGeometry = new THREE.BoxGeometry(10, 10, 10);
 const brickCubeMaterial = new THREE.MeshStandardMaterial({
@@ -117,8 +124,8 @@ const brickCubeMaterial = new THREE.MeshStandardMaterial({
 const brickCube = new THREE.Mesh(brickCubeGeometry, brickCubeMaterial);
 brickCube.castShadow = true;
 brickCube.receiveShadow = true;
-brickCube.position.set(0, 20, 0);
-scene.add(brickCube);
+brickCube.position.set(-10, 20, 0);
+// scene.add(brickCube);
 
 const sphereGeometry = new THREE.SphereGeometry(4, 50, 50);//radius, w, h
 const sphereMaterial = new THREE.MeshStandardMaterial(
@@ -130,11 +137,12 @@ const sphereMaterial = new THREE.MeshStandardMaterial(
 );
 
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-
-scene.add(sphere);
+const sphereId = sphere.id;
+console.log("sphereId=", sphereId);
 sphere.position.set(-10, 0, 0);
 sphere.castShadow = true;
 sphere.receiveShadow = true;
+// scene.add(sphere);
 
 const torusGeometry = new THREE.TorusGeometry(20, 4, 10, 75) ;
 const torusMaterial = new THREE.MeshStandardMaterial(
@@ -148,10 +156,10 @@ const torusMaterial = new THREE.MeshStandardMaterial(
 torusMaterial.map = waterTexture;
 
 const torus = new THREE.Mesh(torusGeometry, torusMaterial);
-scene.add(torus);
 torus.position.set(-10, 20, 0);
 torus.castShadow = true;
 torus.receiveShadow = true;
+// scene.add(torus);
 
 
 /****************************** LIGHTS ****************************************/
@@ -210,8 +218,19 @@ const spotLightHelper = new THREE.SpotLightHelper(spotLight);
 // scene.add(dLShadowHelper);
 
 const axesHelper = new THREE.AxesHelper(5);
-// scene.add(axesHelper);
+scene.add(axesHelper);
 
+//Raycasting:
+
+//create a 2d vector to put 2vals of cursor position
+const mousePosition = new THREE.Vector2();
+
+window.addEventListener('mousemove', function(evt){
+  mousePosition.x = (evt.clientX / window.innerWidth) * 2 - 1;
+  mousePosition.y = (evt.clientY / window.innerHeight) * 2 + 1;
+});
+
+const rayCaster = new THREE.Raycaster();
 
 
 /****************************** ANIMATION *************************************/
@@ -221,18 +240,34 @@ let step = 0;
 function animate(time) {
   // box.rotation.x = time / 1000;
   // box.rotation.y = time / 1000;
+  brickCube.rotation.x += .01;
+  brickCube.rotation.y += .05;
+  brickCube.rotation.z += .01;
   sphere.rotation.x = time / 5000;
   sphere.rotation.y = time / 5000;
   sphere.rotation.z = time / 5000;
-  torus.rotation.x = time / 5000;
-  torus.rotation.y = time / 5000;
-  torus.rotation.z = time / 3500;
+  torus.rotation.x += 0.025;
+  torus.rotation.y += 0.05;
+  torus.rotation.z += 0.01;
   // pointLight.position.set(Math.random(), 5, 5); //attempt at light flickering
   // pointLight.position.set(-20, 40, 5);
 
   //bouncing sphere
   step += options.sphereBounceSpeed;
   sphere.position.y = 20 * Math.abs(Math.sin(step));
+
+  //raycaster (set two ends of ray -- camera & normalized cursor)
+  rayCaster.setFromCamera(mousePosition, camera);
+  const intersects = rayCaster.intersectObjects(scene.children);
+  //select elements using uuid, id, or element name
+  console.log(intersects);
+
+  for(let i = 0; i < intersects.length; i++){
+    if(intersects[i].object.id === boxId){
+      intersects[i].object.material.color.set(0xff0000);
+    }
+  }
+
 
   //spotLight props
   spotLight.angle = options.angle;
