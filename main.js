@@ -130,7 +130,7 @@ brickCube.position.set(-10, 20, 0);
 const sphereGeometry = new THREE.SphereGeometry(4, 50, 50);//radius, w, h
 const sphereMaterial = new THREE.MeshStandardMaterial(
   {
-    color: '#ff2800',
+    color: 'green',
     wireframe: false,
     // normalMap: woodTexture
   }
@@ -142,7 +142,7 @@ console.log("sphereId=", sphereId);
 sphere.position.set(-10, 0, 0);
 sphere.castShadow = true;
 sphere.receiveShadow = true;
-// scene.add(sphere);
+scene.add(sphere);
 
 const torusGeometry = new THREE.TorusGeometry(20, 4, 10, 75) ;
 const torusMaterial = new THREE.MeshStandardMaterial(
@@ -218,7 +218,7 @@ const spotLightHelper = new THREE.SpotLightHelper(spotLight);
 // scene.add(dLShadowHelper);
 
 const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
+// scene.add(axesHelper);
 
 //Raycasting:
 
@@ -240,15 +240,15 @@ let step = 0;
 function animate(time) {
   // box.rotation.x = time / 1000;
   // box.rotation.y = time / 1000;
-  brickCube.rotation.x += .01;
-  brickCube.rotation.y += .05;
-  brickCube.rotation.z += .01;
-  sphere.rotation.x = time / 5000;
-  sphere.rotation.y = time / 5000;
-  sphere.rotation.z = time / 5000;
-  torus.rotation.x += 0.025;
-  torus.rotation.y += 0.05;
-  torus.rotation.z += 0.01;
+  // brickCube.rotation.x += .01;
+  // brickCube.rotation.y += .05;
+  // brickCube.rotation.z += .01;
+  // sphere.rotation.x = time / 5000;
+  // sphere.rotation.y = time / 5000;
+  // sphere.rotation.z = time / 5000;
+  // torus.rotation.x += 0.025;
+  // torus.rotation.y += 0.05;
+  // torus.rotation.z += 0.01;
   // pointLight.position.set(Math.random(), 5, 5); //attempt at light flickering
   // pointLight.position.set(-20, 40, 5);
 
@@ -260,12 +260,12 @@ function animate(time) {
   rayCaster.setFromCamera(mousePosition, camera);
   const intersects = rayCaster.intersectObjects(scene.children);
   //select elements using uuid, id, or element name
-  console.log(intersects);
+  // console.log(intersects);
 
   for(let i = 0; i < intersects.length; i++){
-    if(intersects[i].object.id === boxId){
-      intersects[i].object.material.color.set(0xff0000);
-    }
+   if(intersects[i].object.material.color === 'green'){
+    intersects[i].object.material.color = 'blue';
+   }
   }
 
 
