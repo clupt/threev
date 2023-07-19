@@ -220,7 +220,7 @@ const spotLightHelper = new THREE.SpotLightHelper(spotLight);
 const axesHelper = new THREE.AxesHelper(5);
 // scene.add(axesHelper);
 
-//Raycasting:
+/****************************** RAYCASTING ************************************/
 
 //create a 2d vector to put 2vals of cursor position
 const mousePosition = new THREE.Vector2();
@@ -263,8 +263,13 @@ function animate(time) {
   // console.log(intersects);
 
   for(let i = 0; i < intersects.length; i++){
-   if(intersects[i].object.material.color === 'green'){
-    intersects[i].object.material.color = 'blue';
+   if(intersects[i].object.id === sphereId){
+    sphereMaterial.color.setHex('0x0000ff');
+    console.log("sphere material color", sphereMaterial.color)
+   }
+   if(intersects[i].object.id === boxId){
+    boxMaterial.color.setHex('0xff0000');
+    console.log("box color is now:", boxMaterial.color)
    }
   }
 
