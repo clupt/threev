@@ -2,6 +2,7 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'dat.gui';
+import gsap from 'gsap';
 
 import plants from './imgs/plants.jpg';
 import sky from './imgs/sky.jpg';
@@ -166,9 +167,12 @@ scene.add(torus);
 const group = new THREE.Group();
 scene.add(group);
 
-group.add(sphere, box);
+group.add(sphere, torus);
 
-
+// gsap.to(sphere.position, {duration: 1, delay: 1, x: 50});
+// gsap.to(sphere.position, {duration: 1, delay: 2, x: 0});
+gsap.to(group.position, {duration: 5, delay: 2, x: -80});
+gsap.to(group.position, {duration: 5, delay: 8, x: 0})
 
 /****************************** LIGHTS ****************************************/
 // const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 0.8);
@@ -261,7 +265,7 @@ function animate(time) {
 
   //bouncing whatever is in the group -- sphere & cube
   step += options.sphereBounceSpeed;
-  group.position.y = 20 * Math.abs(Math.sin(step));
+  sphere.position.y = 20 * Math.abs(Math.sin(step));
 
   //raycaster (set two ends of ray -- camera & normalized cursor)
   rayCaster.setFromCamera(mousePosition, camera);
