@@ -153,13 +153,21 @@ const torusMaterial = new THREE.MeshStandardMaterial(
   }
 );
 
-torusMaterial.map = waterTexture;
+// torusMaterial.map = waterTexture;
 
 const torus = new THREE.Mesh(torusGeometry, torusMaterial);
 torus.position.set(-10, 20, 0);
 torus.castShadow = true;
 torus.receiveShadow = true;
-// scene.add(torus);
+scene.add(torus);
+
+/** GROUP */
+
+const group = new THREE.Group();
+scene.add(group);
+
+group.add(sphere, box);
+
 
 
 /****************************** LIGHTS ****************************************/
@@ -197,7 +205,6 @@ const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 scene.add(plane);
 plane.rotation.x = -0.5 * Math.PI; //make plane match grid
 plane.receiveShadow = true;
-
 
 /******************************* HELPERS **************************************/
 //grid
@@ -246,15 +253,15 @@ function animate(time) {
   // sphere.rotation.x = time / 5000;
   // sphere.rotation.y = time / 5000;
   // sphere.rotation.z = time / 5000;
-  // torus.rotation.x += 0.025;
-  // torus.rotation.y += 0.05;
-  // torus.rotation.z += 0.01;
+  torus.rotation.x += 0.025;
+  torus.rotation.y += 0.05;
+  torus.rotation.z += 0.01;
   // pointLight.position.set(Math.random(), 5, 5); //attempt at light flickering
   // pointLight.position.set(-20, 40, 5);
 
-  //bouncing sphere
+  //bouncing whatever is in the group -- sphere & cube
   step += options.sphereBounceSpeed;
-  sphere.position.y = 20 * Math.abs(Math.sin(step));
+  group.position.y = 20 * Math.abs(Math.sin(step));
 
   //raycaster (set two ends of ray -- camera & normalized cursor)
   rayCaster.setFromCamera(mousePosition, camera);
@@ -273,13 +280,13 @@ function animate(time) {
    }
   }
 
-
   //spotLight props
   spotLight.angle = options.angle;
   spotLight.penumbra = options.penumbra;
   spotLight.intensity = options.intensity;
   spotLight.decay = options.decay;
   spotLightHelper.update();
+
 
   orbit.update();
   renderer.render(scene, camera);
