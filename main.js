@@ -31,9 +31,12 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 const orbit = new OrbitControls(camera, renderer.domElement);
-orbit.update(); //call update method every time camera position changes
+orbit.enableDamping = false;
+// orbit.zoomSpeed = 1.5;
+// orbit.update(); //call update method every time camera position changes
+// orbit.autoRotate = true;
 
-camera.position.set(-10, 30, 30);
+camera.position.set(-130, 100, 0);
 
 /******************************** GUI *****************************************/
 const gui = new dat.GUI();
@@ -103,9 +106,9 @@ scene.background = cubeTextureLoader.load([
 const boxGeometry = new THREE.BoxGeometry(20, 20, 20);
 const boxMaterial = new THREE.MeshStandardMaterial(
   {
-    color: 0x00ff00,
+    color: 0xffffff,
     wireframe: false,
-    // map: plantTexture
+    // map: starsTexture
   }
 );
 
@@ -120,20 +123,20 @@ scene.add(box);
 const brickCubeGeometry = new THREE.BoxGeometry(10, 10, 10);
 const brickCubeMaterial = new THREE.MeshStandardMaterial({
   map: brickTexture,
-  normalMap: starsTexture
+  // normalMap: starsTexture
 });
 const brickCube = new THREE.Mesh(brickCubeGeometry, brickCubeMaterial);
+const brickCubeId = brickCube.id;
 brickCube.castShadow = true;
 brickCube.receiveShadow = true;
 brickCube.position.set(-10, 20, 0);
-// scene.add(brickCube);
+scene.add(brickCube);
 
 const sphereGeometry = new THREE.SphereGeometry(4, 50, 50);//radius, w, h
 const sphereMaterial = new THREE.MeshStandardMaterial(
   {
     color: 'green',
     wireframe: false,
-    // normalMap: woodTexture
   }
 );
 
@@ -157,6 +160,7 @@ const torusMaterial = new THREE.MeshStandardMaterial(
 // torusMaterial.map = waterTexture;
 
 const torus = new THREE.Mesh(torusGeometry, torusMaterial);
+const torusId = torus.id;
 torus.position.set(-10, 20, 0);
 torus.castShadow = true;
 torus.receiveShadow = true;
@@ -167,12 +171,32 @@ scene.add(torus);
 const group = new THREE.Group();
 scene.add(group);
 
-group.add(sphere, torus);
+group.add(sphere, torus, brickCube);
 
 // gsap.to(sphere.position, {duration: 1, delay: 1, x: 50});
 // gsap.to(sphere.position, {duration: 1, delay: 2, x: 0});
-gsap.to(group.position, {duration: 5, delay: 2, x: -80});
-gsap.to(group.position, {duration: 5, delay: 8, x: 0})
+gsap.to(group.position, {
+  duration: 2.2,
+  delay: 0.5,
+  ease: "elastic",
+  stagger: 0.1,
+  x: -30,
+  repeat: -1,
+  yoyo: true,
+  yoyoEase: true
+});
+
+gsap.to(box.position, {
+  duration: 2.2,
+  delay: 0.5,
+  ease: "bounce",
+  stagger: 0.1,
+  y: -60,
+  repeat: -1,
+  yoyo: true,
+  yoyoEase: true
+})
+
 
 /****************************** LIGHTS ****************************************/
 // const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 0.8);
@@ -237,8 +261,8 @@ const axesHelper = new THREE.AxesHelper(5);
 const mousePosition = new THREE.Vector2();
 
 window.addEventListener('mousemove', function(evt){
-  mousePosition.x = (evt.clientX / window.innerWidth) * 2 - 1;
-  mousePosition.y = (evt.clientY / window.innerHeight) * 2 + 1;
+  mousePosition.x = (evt.clientX / window.innerWidth - 0.5);
+  mousePosition.y = (evt.clientY / window.innerHeight - 0.5);
 });
 
 const rayCaster = new THREE.Raycaster();
@@ -276,11 +300,17 @@ function animate(time) {
   for(let i = 0; i < intersects.length; i++){
    if(intersects[i].object.id === sphereId){
     sphereMaterial.color.setHex('0x0000ff');
-    console.log("sphere material color", sphereMaterial.color)
+    console.log("sphere material color", sphereMaterial.color);
+
+    // camera.lookAt(sphere.position);
    }
    if(intersects[i].object.id === boxId){
     boxMaterial.color.setHex('0xff0000');
     console.log("box color is now:", boxMaterial.color)
+    // camera.lookAt(box.position);
+   }
+   if(intersects[i].object.id === brickCubeId){
+    brickCubeMaterial.map = waterTexture;
    }
   }
 
@@ -293,6 +323,7 @@ function animate(time) {
 
 
   orbit.update();
+
   renderer.render(scene, camera);
 }
 
