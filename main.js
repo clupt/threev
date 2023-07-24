@@ -166,6 +166,30 @@ torus.castShadow = true;
 torus.receiveShadow = true;
 scene.add(torus);
 
+//geometry using float32array and bufferAttribute (reusable vertices)
+const anotherGeometry = new THREE.BufferGeometry();
+const count = 40;
+
+const positionsArr = new Float32Array(count *3 *3);
+for(let i = 0; i < count *3 *3; i++){
+  positionsArr[i] = Math.random() - 1;
+};
+
+const positionsAttribute = new THREE.BufferAttribute(positionsArr, 3);
+anotherGeometry.setAttribute('position', positionsAttribute);
+anotherGeometry.scale(40, 40, 40);
+const anotherMaterial = new THREE.MeshBasicMaterial({
+  color: 0xffff00,
+  wireframe: true
+});
+
+const jankMesh = new THREE.Mesh(anotherGeometry, anotherMaterial);
+jankMesh.castShadow = true;
+jankMesh.receiveShadow = true;
+scene.add(jankMesh);
+jankMesh.position.set(90, 30, 0);
+
+
 /** GROUP */
 
 const group = new THREE.Group();
@@ -195,7 +219,19 @@ gsap.to(box.position, {
   repeat: -1,
   yoyo: true,
   yoyoEase: true
-})
+});
+
+gsap.to(jankMesh.position, {
+  duration: 2.2,
+  delay: 0.1,
+  ease: "sine",
+  stagger: 0.1,
+  y: 50,
+  z: -30,
+  repeat: -1,
+  yoyo: true,
+  yoyoEase: false
+});
 
 
 /****************************** LIGHTS ****************************************/
@@ -273,8 +309,8 @@ let step = 0;
 // let speed = 0.01; //move speed of bounce to property in gui options obj
 
 function animate(time) {
-  // box.rotation.x = time / 1000;
-  // box.rotation.y = time / 1000;
+  box.rotation.x = time / 1000;
+  box.rotation.y = time / 1000;
   // brickCube.rotation.x += .01;
   // brickCube.rotation.y += .05;
   // brickCube.rotation.z += .01;
@@ -286,6 +322,9 @@ function animate(time) {
   torus.rotation.z += 0.01;
   // pointLight.position.set(Math.random(), 5, 5); //attempt at light flickering
   // pointLight.position.set(-20, 40, 5);
+  jankMesh.rotation.x += 0.005;
+  jankMesh.rotation.y += 0.005;
+  jankMesh.rotation.z += 0.05;
 
   //bouncing whatever is in the group -- sphere & cube
   step += options.sphereBounceSpeed;
@@ -320,7 +359,6 @@ function animate(time) {
   spotLight.intensity = options.intensity;
   spotLight.decay = options.decay;
   spotLightHelper.update();
-
 
   orbit.update();
 
